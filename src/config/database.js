@@ -24,14 +24,8 @@ export const connectDB = async () => {
     });
   } catch (error) {
     console.error(`\nMongoDB Connection Failed: ${error.message}`);
-    console.error(`\nSolutions:`);
-    console.error(`   1. Install MongoDB locally: https://www.mongodb.com/try/download/community`);
-    console.error(`   2. Use MongoDB Atlas (free): https://www.mongodb.com/cloud/atlas`);
-    console.error(`   3. Start local MongoDB: Run 'mongod' in another terminal`);
-    console.error(`\nServer will continue WITHOUT database (some features won't work)\n`);
 
-    if (config.env === 'production') {
-      process.exit(1);
-    }
+
+    throw error;
   }
 };

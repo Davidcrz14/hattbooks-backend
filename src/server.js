@@ -13,8 +13,6 @@ import routes from './routes/index.js';
 
 const app = express();
 
-connectDB();
-
 app.set('trust proxy', 1);
 
 app.use(
@@ -61,7 +59,7 @@ app.use(
   })
 );
 
-// OpenAPI specification endpoint (para herramientas externas)
+
 app.get('/api/openapi.json', (req, res) => {
   res.json(openApiSpec);
 });
@@ -87,9 +85,13 @@ app.use(errorHandler);
 
 const PORT = config.port;
 
-app.listen(PORT, () => {
-  if (config.env === 'development') {
-    console.log(`
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    app.listen(PORT, () => {
+      if (config.env === 'development') {
+        console.log(`
 ╔════════════════════════════════════════════╗
 ║                                            ║
 ║   HattBooks API Server                     ║
@@ -99,17 +101,27 @@ app.listen(PORT, () => {
 ║   API Docs: http://localhost:${PORT}/api/docs  ║
 ║                                            ║
 ╚════════════════════════════════════════════╝
-    `);
-  } else {
-    console.log(
-      `HattBooks API Server running on port ${PORT} [${config.env}]`
-    );
+        `);
+      } else {
+        console.log(
+          `HattBooks API Server running on port ${PORT} [${config.env}]`
+        );
+      }
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
   }
-});
+};
+
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
 
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Promise Rejection:', err);
   process.exit(1);
 });
 
+export { startServer };
 export default app;
